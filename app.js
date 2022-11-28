@@ -308,7 +308,7 @@ app.get('/success', isLoggedIn, async (req, res) => {
 
     if (checkInMongodb){
         const user = JSON.stringify( checkInMongodb );
-        res.redirect(`https://nihonchukosha.vercel.app/?${user}`)
+        res.redirect(`https://nihonchukosha.onrender.com/?${user}`)
     }
     
     else {
@@ -322,7 +322,7 @@ app.get('/success', isLoggedIn, async (req, res) => {
     
         const user = JSON.stringify(preFlight)
     
-        res.redirect(`/https://nihonchukosha.vercel.app/?${user}`)
+        res.redirect(`/https://nihonchukosha.onrender.com/?${user}`)
     }
 })
 
@@ -332,7 +332,7 @@ app.get('/failure', (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.session.destroy();
-    res.redirect('https://nihonchukosha.vercel.app');
+    res.redirect('https://nihonchukosha.onrender.com');
 })
 
 app.get('/auth/google', passport.authenticate('google', {scope : ['email', 'profile']}))
