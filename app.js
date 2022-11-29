@@ -6,19 +6,12 @@ const bcrypt = require('bcrypt');
 const salt = bcrypt.genSaltSync(10);
 require("dotenv").config();
 const path = require('path');
-const passport = require('passport');
-require('./passport');
-const session = require('express-session');
 
 //import schemas
 const mongooseModel = require('./schemas/schema')
 
 app.use(express.json())
 app.use(cors())
-// app.use(express.urlencoded({ extended: false }))
-app.use(session({secret: "ncs"}));
-app.use(passport.initialize());
-app.use(passport.session())
 
 //connect MongoDB Database
 const connectLink = 'mongodb+srv://nihon-chuko-sha:70107437@cluster0.zpwaszs.mongodb.net/?retryWrites=true&w=majority';
@@ -296,52 +289,6 @@ app.post('/submitParts', async (req, res) => {
         console.log(error);
     }
 })
-
-//google passport authenticate
-const isLoggedIn = (req, res, next) => {
-    req.user ? next() : res.sendStatus(401);
-}
-
-app.get('/success', isLoggedIn, async (req, res) => {
-    const email = req.user['_json']['email'];
-    const checkInMongodb = await mongooseModel.registerGoogleUser.findOne({ email });
-
-    if (checkInMongodb){
-        const user = JSON.stringify( checkInMongodb );
-        res.redirect(`https://nihonchukosha.onrender.com/?${user}`)
-    }
-    
-    else {
-        const preFlight = {
-            category: 'guest',
-            firstName: req.user.name['givenName'],
-            lastName: req.user.name['familyName'],
-            email: email,
-            img: req.user._json.picture
-        }
-    
-        const user = JSON.stringify(preFlight)
-    
-        res.redirect(`/https://nihonchukosha.onrender.com/?${user}`)
-    }
-})
-
-app.get('/failure', (req, res) => {
-    res.send('failure');
-})
-
-app.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('https://nihonchukosha.onrender.com');
-})
-
-app.get('/auth/google', passport.authenticate('google', {scope : ['email', 'profile']}))
-
-app.get('/google/callback',
-    passport.authenticate('google', {
-        successRedirect: '/success',
-        failureRedirect: '/failure'
-    }))
 
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static('/client/build'))
